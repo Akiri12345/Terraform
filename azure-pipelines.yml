@@ -1,0 +1,78 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: windows-latest
+
+
+steps:
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+  inputs:
+    PathtoPublish: love
+
+
+steps:
+
+- task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV3@3
+
+  displayName: 'Terraform : init'
+
+  inputs:
+
+    workingDirectory: '$(System.DefaultWorkingDirectory)/_pro-CI/drop'
+
+    backendServiceArm: 'Akiriarthur1 (df9b91c2-f882-4c94-bfa6-8ddfc87beb0a)'
+
+    backendAzureRmResourceGroupName: 'Devops-rg'
+
+    backendAzureRmStorageAccountName: libservicr123411
+
+    backendAzureRmContainerName: devs
+
+    backendAzureRmKey: terraform.tfstate
+
+steps:
+
+- task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV3@3
+
+  displayName: 'Terraform : validate'
+
+  inputs:
+
+    command: validate
+
+    workingDirectory: '$(System.DefaultWorkingDirectory)/_pro-CI/drop'
+
+
+
+steps:
+- task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV3@3
+  displayName: 'Terraform : plan'
+  inputs:
+    command: plan
+    workingDirectory: '$(System.DefaultWorkingDirectory)/_pro-CI/drop'
+    environmentServiceNameAzureRM: 'Akiriarthur1 (df9b91c2-f882-4c94-bfa6-8ddfc87beb0a)'
+
+steps:
+
+- task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV3@3
+
+  displayName: 'Terraform : apply'
+
+  inputs:
+
+    command: apply
+
+    workingDirectory: '$(System.DefaultWorkingDirectory)/_pro-CI/drop'
+
+    commandOptions: '-auto-approve'
+
+    environmentServiceNameAzureRM: 'Akiriarthur1 (df9b91c2-f882-4c94-bfa6-8ddfc87beb0a)'
+
+
